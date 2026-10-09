@@ -1,0 +1,20 @@
+# Dépendances
+node_modules/
+
+# Sorties de construction (régénérées par npm run build / site)
+dist/
+dist-sel/
+build/
+*.zip
+
+# Tests
+coverage/
+test-results/
+playwright-report/
+
+# Divers
+.DS_Store
+*.log
+.env*
+!.env.example
+*.tsbuildinfo

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <path d="M24 4 L44 14 L44 34 L24 44 L4 34 L4 14 Z" fill="#0b111e"/>
+  <path d="M24 4 L44 14 L44 34 L24 44 L4 34 L4 14 Z" fill="none" stroke="#3a9bd5" stroke-width="2.5"/>
+  <path d="M4 14 L44 34 M4 34 L44 14 M24 4 L24 44" stroke="#3a9bd5" stroke-opacity="0.4" stroke-width="0.5"/>
+  <rect x="14" y="17" width="20" height="14" rx="2" fill="#3a9bd5"/>
+  <text x="24" y="27.5" font-family="Arial, sans-serif" font-size="7.5" font-weight="900" fill="#ffffff" text-anchor="middle">S.E.L.</text>
+</svg>

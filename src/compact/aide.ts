@@ -1,0 +1,88 @@
+/**
+ * Aide contextuelle des champs de l'interface compacte : définition, valeur usuelle, référence.
+ * Clé = libellé exact de la ligne (le composant Row la retrouve automatiquement).
+ */
+export interface Aide { def: string; usuel?: string; ref?: string }
+
+const dim = (quoi: string): Aide => ({ def: `${quoi}, dimension brute du béton coffré.`, usuel: 'Multiple de 5 cm ; 20 cm minimum conseillé (feu, bétonnage).' });
+
+export const AIDE: Record<string, Aide> = {
+  // Géométrie
+  'Forme de section': { def: "Forme de la section de béton. Les formes autres que le rectangle et le cercle sont calculées dans leurs axes principaux d'inertie, avec une barre à chaque angle.", ref: 'EC2 §9.5.2(4)' },
+  'Largeur b': dim('Largeur de la section'), 'Hauteur h': dim('Hauteur de la section (plan de flexion principal)'), 'Diamètre D': dim('Diamètre du poteau circulaire'),
+  'Côté a': dim("Côté de l'hexagone régulier"), 'Rayon R': dim('Rayon'),
+  'Aile verticale : épaisseur': dim("Épaisseur de l'aile verticale du L"), 'Aile verticale : hauteur': dim("Hauteur hors tout de l'aile verticale"),
+  'Aile horizontale : longueur': dim("Longueur hors tout de l'aile horizontale"), 'Aile horizontale : épaisseur': dim("Épaisseur de l'aile horizontale"),
+  'Âme : épaisseur': dim("Épaisseur de l'âme du T"), 'Âme : hauteur': dim("Hauteur de l'âme, sous la table"), 'Table : largeur': dim('Largeur de la table du T'), 'Table : épaisseur': dim('Épaisseur de la table'),
+  'Branche verticale : épaisseur': dim('Épaisseur de la branche verticale'), 'Branche verticale : hauteur': dim('Hauteur hors tout de la branche verticale'),
+  'Branche horizontale : longueur': dim('Longueur hors tout de la branche horizontale'), 'Branche horizontale : épaisseur': dim('Épaisseur de la branche horizontale'),
+  'Hauteur libre l': { def: 'Hauteur libre du poteau entre les faces des planchers ou poutres qui le tiennent.', usuel: '2,5 à 4 m en bâtiment.', ref: 'EC2 §5.8.3.2' },
+  'Structure': { def: "Contreventée : les déplacements horizontaux en tête sont empêchés par des voiles, noyaux ou palées. Non contreventée : le poteau participe à la stabilité horizontale (portique, console).", ref: 'EC2 §5.8.3.2, §5.8.3.1' },
+  'Liaisons (β)': { def: 'Longueur efficace l0 = β·l selon les liaisons aux extrémités.', usuel: 'Contreventé : 1,0 par sécurité (articulé-articulé) ; 0,7 ou 0,5 si les encastrements sont justifiés.', ref: 'EC2 §5.8.3.2, fig. 5.7' },
+  // Matériaux
+  'Béton': { def: "Classe de résistance C fck/fck,cube (résistance caractéristique sur cylindre / sur cube, en MPa).", usuel: 'C25/30 à C35/45 en bâtiment ; vérifier la classe minimale selon l\'exposition.', ref: 'EC2 tab. 3.1, annexe E' },
+  'Acier': { def: "Nuance de l'acier à haute adhérence (limite d'élasticité caractéristique fyk).", usuel: 'B500, classe de ductilité B.', ref: 'EC2 annexe C' },
+  "Classe d'exposition": { def: "Environnement du poteau : détermine l'enrobage et la classe de béton minimale.", usuel: 'XC1 intérieur sec ; XC3 abrité humide ; XC4 extérieur exposé à la pluie ; XS1 air marin ; XD1 sels.', ref: 'EC2 tab. 4.1, 4.4N' },
+  'Paramètres nationaux': { def: "Valeurs des paramètres déterminés au niveau national : Annexe nationale française, ou valeurs recommandées par l'EC2.", usuel: 'Annexe France au Cameroun et en France.' },
+  // Charges
+  'Type de sollicitation': { def: "Compression centrée : seuls l'imperfection géométrique et l'excentricité minimale créent un moment. Flexion composée : des moments d'extrémité sont transmis par les poutres ou planchers." },
+  'Saisie': { def: 'Charges G et Q : l\'application forme les combinaisons (ELU 1,35 G + 1,5 Q, ELS caractéristique et quasi-permanente). Valeurs ELU : effort de calcul saisi directement.', ref: 'EN 1990 éq. 6.10' },
+  'Permanentes G': { def: 'Charges permanentes caractéristiques transmises au poteau : poids des planchers, revêtements, cloisons, façades.', ref: 'EN 1991-1-1' },
+  'Exploitation Q': { def: "Charges d'exploitation caractéristiques cumulées sur les niveaux portés (réduction éventuelle par le nombre d'étages à appliquer par vous).", usuel: 'Habitation 1,5 kN/m² ; bureaux 2,5 kN/m² ; commerces 5 kN/m².', ref: 'EN 1991-1-1 tab. 6.2' },
+  "Catégorie d'usage (EN 1990, A1.1)": { def: "Catégorie des locaux : fixe ψ1 (valeur fréquente, utilisée en situation d'incendie en France) et ψ2 (quasi-permanente, fluage et ELS).", ref: 'EN 1990 tab. A1.1' },
+  'ψ1 / ψ2': { def: 'Coefficients de combinaison : ψ1 pour la valeur fréquente, ψ2 pour la valeur quasi-permanente de Q.', usuel: 'Habitation et bureaux : 0,5 / 0,3.', ref: 'EN 1990 tab. A1.1' },
+  'NEd (ELU)': { def: "Effort normal de calcul à l'état limite ultime, compression positive.", ref: 'EN 1990 éq. 6.10' },
+  'Tête / pied': { def: "Moments du premier ordre de calcul (ELU) en tête et en pied, en valeur absolue, sans l'imperfection (ajoutée par le calcul).", ref: 'EC2 §5.8.8.2' },
+  'Courbure': { def: 'Simple : les deux moments tendent la même face (cas le plus défavorable). Double : ils tendent des faces opposées ; le moment équivalent et l\'élancement limite en tiennent compte.', ref: 'EC2 §5.8.3.1, éq. 5.32' },
+  // Options avancées
+  'αcc': { def: 'Coefficient des effets à long terme sur la résistance du béton.', usuel: '1,0 (valeur recommandée et Annexe France) ; 0,85 en option prudente.', ref: 'EC2 §3.1.6' },
+  'γc / γs': { def: 'Coefficients partiels du béton et de l\'acier.', usuel: 'Situations durables : 1,5 / 1,15 ; accidentelles : 1,2 / 1,0.', ref: 'EC2 tab. 2.1N' },
+  'Classe structurale': { def: "Classe servant à lire l'enrobage minimal de durabilité ; « Calculée » applique le tableau de modulation (durée d'utilisation, classe de béton…).", usuel: 'S4 pour 50 ans avant modulation.', ref: 'EC2 tab. 4.3N / 4.3NF' },
+  "Durée d'utilisation": { def: "Durée d'utilisation de projet de l'ouvrage.", usuel: '50 ans (bâtiments courants) ; 100 ans (ouvrages exceptionnels).', ref: 'EN 1990 tab. 2.1' },
+  'Δcdev': { def: "Tolérance d'exécution ajoutée à l'enrobage minimal.", usuel: '10 mm ; 5 mm seulement avec un système d\'assurance de la qualité mesurant l\'enrobage.', ref: 'EC2 §4.4.1.3' },
+  'Méthode': { def: 'Méthode simplifiée de calcul du second ordre.', usuel: 'Courbure nominale (la plus employée) ; la rigidité nominale est affichée en comparaison.', ref: 'EC2 §5.8.7, §5.8.8' },
+  'Longueur efficace': { def: 'Coefficient β forfaitaire, ou calcul à partir des souplesses k1 et k2 des encastrements.', ref: 'EC2 éq. 5.15, 5.16' },
+  'k1 (tête) / k2 (pied)': { def: 'Souplesse relative des encastrements : k = (θ/M)·(EI/l).', usuel: '0,1 encastrement parfait (minimum conseillé) ; 1000 articulation.', ref: 'EC2 §5.8.3.2(3)' },
+  'Fluage φef': { def: "Coefficient de fluage effectif, calculé selon l'annexe B à partir de l'humidité, de l'âge au chargement, de la classe de ciment et de la température, ou saisi.", ref: 'EC2 §5.8.4, annexe B' },
+  'RH / t0': { def: "Humidité relative ambiante (%) et âge du béton à la mise en charge (jours).", usuel: 'Intérieur 50 %, extérieur 80 % ; t0 = 28 jours.', ref: 'EC2 annexe B' },
+  'Température moyenne': { def: "Température moyenne pendant le durcissement ; une température élevée augmente l'âge équivalent et réduit le fluage.", usuel: '20 °C ; 25 à 30 °C en climat tropical.', ref: 'EC2 annexe B (B.10)' },
+  'Classe de ciment': { def: 'Vitesse de durcissement du ciment.', usuel: 'N pour CEM I 42,5 N et CEM II 32,5 R ; R pour 42,5 R et 52,5 ; S pour CEM III.', ref: 'EC2 §3.1.2(6)' },
+  'φef saisi': { def: 'Coefficient de fluage effectif imposé.', usuel: '1 à 2 en bâtiment courant.', ref: 'EC2 §5.8.4' },
+  'TEd': { def: 'Moment de torsion de calcul.', ref: 'EC2 §6.3' },
+  'VEd plan de b': { def: "Effort tranchant de calcul agissant dans le plan de b.", ref: 'EC2 §6.2' },
+  'Ncar (caractéristique)': { def: 'Effort normal sous combinaison caractéristique (vérification de la contrainte à 0,6 fck en classes XD, XS, XF).', ref: 'EC2 §7.2(2)' },
+  'Nqp (quasi-permanent)': { def: 'Effort normal sous combinaison quasi-permanente (contrainte à 0,45 fck, fluage effectif).', ref: 'EC2 §7.2(3)' },
+  'Mqp plan de h': { def: "Moment quasi-permanent dans le plan de h, pour le calcul de l'ouverture des fissures.", ref: 'EC2 §7.3.4' },
+  'Durée requise': { def: "Durée de résistance au feu exigée par la réglementation du bâtiment.", usuel: 'R60 en habitation courante ; R90 à R120 pour les établissements recevant du public ou les immeubles hauts.', ref: 'EN 1992-1-2 §5.3.2' },
+  'l0,fi': { def: "Longueur de flambement en situation d'incendie.", usuel: '0,5 l aux niveaux intermédiaires ; 0,7 l au dernier niveau.', ref: 'EN 1992-1-2 §5.3.1(3)' },
+  'μfi imposé': { def: "Taux de chargement en situation d'incendie ; 0 prend μfi = ηfi (sécuritaire).", ref: 'EN 1992-1-2 §5.3.2(3)' },
+  // Armatures
+  'Diamètre Φl': { def: 'Diamètre des barres longitudinales.', usuel: 'HA12 à HA25 ; 8 mm minimum.', ref: 'EC2 §9.5.2(1)' },
+  'Nombre de barres': { def: 'Nombre total de barres longitudinales, réparties par l\'application (une par angle, puis dans les plus grands intervalles).', usuel: '4 minimum en rectangle et en cercle.', ref: 'EC2 §9.5.2(4)' },
+  'Diamètre Φt': { def: 'Diamètre des cadres.', usuel: 'Au moins 6 mm et Φl/4.', ref: 'EC2 §9.5.3(1)' },
+  'Espacement courant': { def: 'Espacement des cadres en partie courante ; il est réduit automatiquement aux abouts et dans les recouvrements.', usuel: 'Au plus min(20 Φl ; plus petite dimension ; 400 mm).', ref: 'EC2 §9.5.3(3), (4)' },
+  'Longueurs': { def: "Longueurs d'ancrage et de recouvrement calculées selon l'EC2, ou saisies en multiples du diamètre.", ref: 'EC2 §8.4, §8.7' },
+  'Adhérence': { def: "Conditions d'adhérence : bonnes pour les barres verticales d'un poteau bétonné normalement.", ref: 'EC2 §8.4.2, fig. 8.2' },
+  'Barres recouvertes': { def: 'Proportion de barres recouvertes dans une même section (coefficient α6).', usuel: '100 % pour des attentes toutes au même niveau.', ref: 'EC2 §8.7.3, tab. 8.3' },
+  "Zones d'ancrage / recouvrement": { def: "Nombre d'ancrages (pied en fondation, par exemple) et de recouvrements (attentes) par barre, pour la nomenclature.", usuel: '1 / 1 pour un poteau d\'étage courant.' },
+  'As fourni / requis': { def: "Section d'acier longitudinal posée / section nécessaire (maximum du calcul et du minimum réglementaire).", ref: 'EC2 §6.1, §9.5.2(2)' },
+  "Taux d'armatures ρ": { def: "Rapport As/Ac de l'acier longitudinal posé.", usuel: 'Entre 0,2 % et 4 % (8 % dans les recouvrements).', ref: 'EC2 §9.5.2(2), (3)' },
+  'Abouts / recouvrements': { def: "Espacement des cadres réduit à 0,6 fois l'espacement maximal sur la plus grande dimension de la section en tête et en pied, et dans les recouvrements.", ref: 'EC2 §9.5.3(4)' },
+  'Nombre de cadres': { def: 'Nombre de niveaux de cadres sur la hauteur, zones resserrées comprises ; les sections en L, T ou croix ont plusieurs cadres par niveau.' },
+  'Ancrage': { def: "Longueur d'ancrage saisie, en multiple du diamètre de la barre." },
+  'Recouvrement': { def: 'Longueur de recouvrement saisie, en multiple du diamètre de la barre.' },
+  'lb,rqd': { def: "Longueur d'ancrage de référence : (Φ/4)·σsd/fbd, avec σsd = fyd.", ref: 'EC2 éq. 8.3' },
+  'lbd (ancrage)': { def: "Longueur d'ancrage de calcul, au moins égale à lb,min.", ref: 'EC2 éq. 8.4' },
+  'l0 (recouvrement)': { def: 'Longueur de recouvrement des barres, fonction du pourcentage de barres recouvertes.', ref: 'EC2 éq. 8.10' },
+  'Barres': { def: "État des barres retenu pour l'ancrage : comprimées en compression centrée, tendues (hypothèse enveloppe) en flexion composée." },
+  'Établi par': { def: "Auteur de la note (cartouche : « Établi par »)." },
+  'Vérifié par': { def: 'Vérificateur (contrôle interne ou externe).' },
+  'Approuvé par': { def: 'Responsable qui approuve la diffusion du document.' },
+  // Réglages
+  'Raison sociale': { def: "Nom de l'entreprise, repris dans l'en-tête de la note et le cartouche des plans." },
+  'Sous-titre du cartouche': { def: 'Deuxième ligne du cartouche, sous « NOTE DE CALCUL » (par exemple : POTEAUX BÉTON ARMÉ).' },
+  'Copyright': { def: 'Mention de pied de page de la note ; par défaut « © année entreprise ».' },
+  'Référence du document': { def: 'Numéro d\'identification de la note, repris dans le cartouche (ISO 7200).' },
+  'Indice de révision': { def: 'Indice de la version en cours du document ; à tenir à jour avec le tableau des révisions.' },
+  'Contenu': { def: 'La note peut porter sur le poteau affiché ou sur tous les poteaux du projet (avec une synthèse).' },
+};
